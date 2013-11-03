@@ -1,0 +1,6 @@
+*.o
+libcryptsetup.a
+*~
+DEADJOE
+core
+cryptsetup
