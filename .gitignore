@@ -4,3 +4,4 @@ libcryptsetup.a
 DEADJOE
 core
 cryptsetup
+depinclude/uuid

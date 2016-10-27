@@ -1,14 +1,19 @@
 #! /bin/sh --
-BINPREFIX='/home/pts/prg/pts-mini-gpl/uevalrun/cross-compiler/bin/i686-'
+BINPREFIX='/home/pts/prg/cross-compiler-i686/bin/i686-'
 CC="${BINPREFIX}gcc -static -fno-stack-protector"
 AR="${BINPREFIX}ar"
 RANLIB="${BINPREFIX}ranlib"
 
 set -ex
 rm -f *.o *.a cryptsetup
+rm -f depinclude/uuid
+ln -s ../../pts-static-libuuid depinclude/uuid  # for <uuid/uuid.h>
 # TODO: Get rid of warnings.
 $CC -s -O2 -W -Wall -Ilib/luks1 -Ilib/loopaes -Ilib/verity -Ilib/tcrypt \
     -Ilib/crypto_backend -Ilib -include config.h \
+    -Idepinclude \
+    -I../pts-static-libdevmapper \
+    -I../pts-static-libpopt \
     -Wno-unused-parameter \
     -DHAVE_CONFIG_H -c \
     lib/setup.c lib/utils.c lib/utils_benchmark.c lib/utils_crypt.c \
@@ -27,9 +32,17 @@ $RANLIB libcryptsetup.a
 # TODO: Get rid of warnings.
 $CC -s -O2 -W -Wall -Ilib/luks1 -Ilib/loopaes -Ilib/verity -Ilib/tcrypt \
     -Ilib/crypto_backend -Ilib -I. -include config.h \
+    -Idepinclude \
+    -I../pts-static-libdevmapper \
+    -I../pts-static-libpopt \
     -Wno-unused-parameter \
     -DHAVE_CONFIG_H -o cryptsetup \
     src/utils_tools.c src/utils_password.c src/cryptsetup.c \
-    libcryptsetup.a -luuid -ldevmapper -lpopt
+    libcryptsetup.a \
+    ../pts-static-libuuid/libuuid.a \
+    ../pts-static-libdevmapper/libdevmapper.a \
+    ../pts-static-libpopt/libpopt.a \
+;
+    # -L. -luuid -ldevmapper -lpopt \
 
 : c.sh OK.
